@@ -11,7 +11,7 @@ struct PlayButton: View {
     
     @Binding var animateViewsIn : Bool
     let geo : GeometryProxy
-    @State private var playGame = false
+    @Binding var playGame : Bool
     @State private var scalePlayButton = false
 
     var body: some View {
@@ -51,7 +51,7 @@ struct PlayButton: View {
 #Preview {
     
     GeometryReader{ geo in
-        PlayButton(animateViewsIn: .constant(true), geo: geo)
+        PlayButton(animateViewsIn: .constant(true), geo: geo, playGame: .constant(false))
     }
     
 }
