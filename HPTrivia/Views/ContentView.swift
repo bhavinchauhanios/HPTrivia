@@ -50,5 +50,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .preferredColorScheme(.dark)
+        .environment(Game())
 }
