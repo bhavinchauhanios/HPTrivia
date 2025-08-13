@@ -226,6 +226,7 @@ struct GamePlay: View {
                             }
                         }
                         
+                        
                         Spacer()
                     }
                     .disabled(tappedCorrectAnswer)

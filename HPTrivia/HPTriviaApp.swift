@@ -29,8 +29,8 @@ struct HPTriviaApp: App {
  ✅ Audio
  ✅ Animations
  ✅ In-app purchases
- - Store
+ ✅ Store
  ✅ Instruction screen
- 🟦 Books
+ ✅ Books
  ✅ Persist scores
  */

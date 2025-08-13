@@ -10,7 +10,6 @@ import SwiftUI
 struct SelectBooks: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(Game.self) private var game
-    @State private var showTempAlert  = false
     
     private var store = Store()
     
@@ -41,12 +40,18 @@ struct SelectBooks: View {
              
                     LazyVGrid(columns: [GridItem(),GridItem()]){
                         ForEach(game.bookQuestions.books){ book in
-                            if book.status == .active{
+                            if book.status == .active || (book.status == .locked && store.purchased.contains(book.image)){
                               
                                 ActiveBook(book: book)
+                                .task{
+                                    game.bookQuestions.changeStatus(of: book.id, to: .active)
+                                }
+                                
                                 .onTapGesture {
                                     game.bookQuestions.changeStatus(of: book.id, to: .inactive)
                                 }
+                                
+                                
                             }else if book.status == .inactive{
                                 InactiveBook(book: book)
 
@@ -56,11 +61,23 @@ struct SelectBooks: View {
                                 
                             }else{
                                 
-                                LockedBook(book: book)
-                                .onTapGesture {
-                                    showTempAlert.toggle()
-                                    game.bookQuestions.changeStatus(of: book.id, to: .active)
-                                }
+                                    LockedBook(book: book)
+                                
+                                    .onTapGesture {
+                                        let index = book.id - 4
+                                        
+                                        // Safely check that index is within the range of the products array
+                                        if store.products.indices.contains(index) {
+                                            let product = store.products[index]
+                                            
+                                            Task {
+                                                await store.purchase(product)
+                                            }
+                                        } else {
+                                            print("Invalid product index: \(index)")
+                                            // Optionally show an alert or handle the error
+                                        }
+                                    }
                                 
                             }
                         }
@@ -73,6 +90,8 @@ struct SelectBooks: View {
                 }
                 
                 Button("Done"){
+                    game.bookQuestions.saveStatus()
+                    
                     dismiss()
                 }
                 .font(.largeTitle)
@@ -81,17 +100,10 @@ struct SelectBooks: View {
                 .tint(.brown.mix(with: .black, by: 0.2))
                 .foregroundStyle(.white)
                 .disabled(!activeBooks)
-                    
             }
             .foregroundStyle(.black)
-            
         }
-        .interactiveDismissDisabled(!activeBooks)
-        .alert("You purchased a new question pack. Yay!", isPresented: $showTempAlert) {
-            
-            
-        }
-        
+        .interactiveDismissDisabled()
         .task {
             await store.loadProducts()
         }
