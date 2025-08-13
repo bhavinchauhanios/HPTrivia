@@ -20,9 +20,9 @@ struct RecentScores: View {
                     Text("Recent Scores")
                         .font(.title2)
                     
-                    Text("\(game.recentSwcores[0])")
-                    Text("\(game.recentSwcores[1])")
-                    Text("\(game.recentSwcores[2])")
+                    Text("\(game.recentScores[0])")
+                    Text("\(game.recentScores[1])")
+                    Text("\(game.recentScores[2])")
                     
                 }
                 .font(.title3)

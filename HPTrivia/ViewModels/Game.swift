@@ -13,11 +13,17 @@ class Game{
     var bookQuestions = BookQuestions()
     var gameScore = 0
     var questionScore = 5
-    var recentSwcores = [0,0,0]
+    var recentScores = [0,0,0]
     var activeQuestions : [Question] = []
     var answeredQuestions : [Int] = []
     var currentQuestion = try! JSONDecoder().decode([Question].self, from: Data(contentsOf: Bundle.main.url(forResource: "trivia", withExtension: "json")!))[0]
     var answers : [String] = []
+    
+    let savePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "RecentScores")
+    
+    init() {
+        loadScrores()
+    }
     
     func startGame(){
         for book in bookQuestions.books{
@@ -58,20 +64,41 @@ class Game{
     
     func correct(){
         answeredQuestions.append(currentQuestion.id)
+        withAnimation {
+            gameScore += questionScore
+        }
         
-        gameScore += questionScore
     }
     
     func endGame(){
         
-        recentSwcores[2] = recentSwcores[1]
-        recentSwcores[1] = recentSwcores[0]
-        recentSwcores[0] = gameScore
+        recentScores[2] = recentScores[1]
+        recentScores[1] = recentScores[0]
+        recentScores[0] = gameScore
+        saveScores()
         
         gameScore = 0
         activeQuestions = []
         answeredQuestions = []
         
     }
+
+    func saveScores(){
+        do{
+            let data = try JSONEncoder().encode(recentScores)
+            try data.write(to: savePath)
+        }catch{
+            print("Unable to save data: \(error)")
+        }
+    }
     
+    func loadScrores(){
+        do{
+            let data = try Data(contentsOf: savePath)
+            recentScores = try JSONDecoder().decode([Int].self, from: data)
+        }catch{
+            recentScores = [0,0,0]
+            print("Unable to laod data: \(error)")
+        }
+    }
 }
